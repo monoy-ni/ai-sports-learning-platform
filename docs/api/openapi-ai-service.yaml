@@ -1,0 +1,35 @@
+openapi: 3.0.3
+info:
+  title: AI 体育学习平台内部 AI 服务 API
+  version: 0.1.0
+paths:
+  /internal/ai/v1/daily-analysis:
+    post:
+      summary: 生成每日运动分析
+      responses:
+        "200":
+          description: 结构化 AI 任务结果
+  /internal/ai/v1/plan-generation:
+    post:
+      summary: 生成学期运动计划
+      responses:
+        "200":
+          description: 结构化 AI 任务结果
+  /internal/ai/v1/term-report:
+    post:
+      summary: 生成结课报告草稿
+      responses:
+        "200":
+          description: 结构化 AI 任务结果
+  /internal/ai/v1/tasks/{taskId}:
+    get:
+      summary: 查询 AI 任务状态
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: AI 任务状态

@@ -1,0 +1,34 @@
+# OS and editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+
+# Environment
+.env
+.env.local
+*.local
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+
+# Java
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Python
+ai-service/.venv/
+ai-service/.pytest_cache/
+ai-service/.ruff_cache/
+ai-service/__pycache__/
+ai-service/**/*.pyc
+ai-service/*.egg-info/
+
+# Logs
+*.log
+logs/
+

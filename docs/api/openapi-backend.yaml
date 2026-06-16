@@ -1,0 +1,51 @@
+openapi: 3.0.3
+info:
+  title: AI 体育学习平台后端 API
+  version: 0.1.0
+paths:
+  /api/auth/login:
+    post:
+      summary: 使用用户名和密码登录
+      responses:
+        "200":
+          description: JWT token 和当前用户信息
+  /api/auth/me:
+    get:
+      summary: 获取当前登录用户
+      responses:
+        "200":
+          description: 当前用户信息
+  /api/student/dashboard:
+    get:
+      summary: 学生看板摘要
+      responses:
+        "200":
+          description: 看板数据
+  /api/student/health-profile:
+    post:
+      summary: 创建健康档案
+      responses:
+        "200":
+          description: 已创建的健康档案
+    put:
+      summary: 更新健康档案
+      responses:
+        "200":
+          description: 已更新的健康档案
+  /api/student/sport-plans/generate:
+    post:
+      summary: 生成学期运动计划
+      responses:
+        "200":
+          description: 运动计划和 AI 任务结果
+  /api/student/check-ins:
+    get:
+      summary: 查询学生打卡记录
+      responses:
+        "200":
+          description: 打卡记录列表
+    post:
+      summary: 创建每日打卡
+      responses:
+        "200":
+          description: 已创建的打卡记录和 AI 任务状态

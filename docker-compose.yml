@@ -1,0 +1,63 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: ai-sports-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-ai_sports}
+      MYSQL_USER: ${MYSQL_USER:-ai_sports}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ai_sports_password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./infra/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  ai-service:
+    build:
+      context: .
+      dockerfile: infra/docker/ai-service.Dockerfile
+    environment:
+      INTERNAL_AI_SERVICE_TOKEN: ${INTERNAL_AI_SERVICE_TOKEN:-local-internal-ai-token}
+      AI_MODEL_NAME: ${AI_MODEL_NAME:-mock-deep-agent}
+    ports:
+      - "8000:8000"
+
+  backend:
+    build:
+      context: .
+      dockerfile: infra/docker/backend.Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-ai_sports}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-ai_sports}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-ai_sports_password}
+      APP_SECURITY_JWT_SECRET: ${BACKEND_JWT_SECRET:-change-me-to-a-256-bit-secret-for-local-dev-only}
+      APP_AI_BASE_URL: http://ai-service:8000
+      APP_AI_INTERNAL_TOKEN: ${INTERNAL_AI_SERVICE_TOKEN:-local-internal-ai-token}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: infra/docker/frontend.Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  mysql-data:
+
