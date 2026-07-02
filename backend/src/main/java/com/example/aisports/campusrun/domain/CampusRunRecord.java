@@ -22,5 +22,11 @@ public class CampusRunRecord {
     void prePersist() {
         createdAt = Instant.now();
     }
+
+    public Long getId() { return id; }
+    public Long getStudentId() { return studentId; }
+    public BigDecimal getScore() { return score; }
+    public DataSource getDataSource() { return dataSource; }
+    public Instant getCreatedAt() { return createdAt; }
 }
 

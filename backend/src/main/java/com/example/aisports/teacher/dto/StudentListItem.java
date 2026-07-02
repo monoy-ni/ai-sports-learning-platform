@@ -1,5 +1,17 @@
 package com.example.aisports.teacher.dto;
 
-public record StudentListItem(Long id, String name, String className, String bmiCategory, String checkInStatus, String reportStatus) {
-}
+import java.math.BigDecimal;
 
+public record StudentListItem(
+    Long id,
+    String name,
+    String studentNumber,
+    String className,
+    BigDecimal bmi,
+    String bmiCategory,
+    BigDecimal campusRunScore,
+    String checkInStatus,
+    String reportStatus,
+    int riskFlagCount
+) {
+}

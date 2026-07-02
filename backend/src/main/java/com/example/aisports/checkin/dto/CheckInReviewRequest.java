@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 public record CheckInReviewRequest(
     Boolean abnormal,
     String abnormalReason,
-    @NotBlank String teacherReviewNote
+    @NotBlank String teacherReviewNote,
+    String editReason
 ) {
 }
-

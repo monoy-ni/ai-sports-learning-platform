@@ -84,5 +84,13 @@ public class TermReport {
     public void setStatus(ReportStatus status) {
         this.status = status;
     }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
 }
 

@@ -5,12 +5,13 @@
 ## 项目结构
 
 ```text
-frontend/    React + TypeScript + Vite 前端应用，包含学生端和教师端
-backend/     Spring Boot 业务后端，负责 JWT/RBAC、MySQL、AI 服务调用
-ai-service/  FastAPI 内部 AI 服务，包含三类 Agent 的 mock 适配
-docs/        前端、后端、AI、接口、ADR、版本和计划文档
-infra/       Dockerfile、MySQL、Nginx 等基础设施配置
-scripts/     本地开发辅助脚本
+frontend/          React + TypeScript + Vite 学生端 demo 前端
+frontend-teacher/  教师端 MVP 独立前端应用（看板/学生详情/异常审核/结课报告）
+backend/           Spring Boot 业务后端，负责 JWT/RBAC、MySQL、AI 服务调用
+ai-service/        FastAPI 内部 AI 服务，包含三类 Agent 的 mock 适配
+docs/              前端、后端、AI、接口、ADR、版本和计划文档
+infra/             Dockerfile、MySQL、Nginx 等基础设施配置
+scripts/           本地开发辅助脚本
 ```
 
 ## 服务边界
@@ -26,9 +27,10 @@ scripts/     本地开发辅助脚本
 | Service | Port | URL |
 | --- | --- | --- |
 | 前端 | 5173 | `http://localhost:5173` |
+| 教师端前端 | 5174 | `http://localhost:5174` |
 | 后端 | 8080 | `http://localhost:8080` |
 | AI 服务 | 8000 | `http://localhost:8000` |
-| MySQL | 3306 | `localhost:3306` |
+| MySQL | 3307 | `localhost:3307` |
 
 ## 本地开发
 
@@ -47,6 +49,20 @@ mvn spring-boot:run
 cd ..\frontend
 npm install
 npm run dev
+```
+
+启动教师端 MVP（独立前端应用）：
+
+```powershell
+cd ..\frontend-teacher
+npm install
+npm run dev   # http://localhost:5174
+```
+
+如果你修改过 `docker-compose.yml` 中 MySQL 的宿主机端口映射，需要重新创建容器让映射生效：
+
+```powershell
+docker compose up -d --force-recreate mysql
 ```
 
 后端内置本地开发演示账号：

@@ -5,7 +5,7 @@ spring:
   application:
     name: ai-sports-backend
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/ai_sports?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/ai_sports?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
     username: ${SPRING_DATASOURCE_USERNAME:ai_sports}
     password: ${SPRING_DATASOURCE_PASSWORD:ai_sports_password}
   jpa:
@@ -22,4 +22,3 @@ app:
   ai:
     base-url: ${APP_AI_BASE_URL:http://localhost:8000}
     internal-token: ${APP_AI_INTERNAL_TOKEN:local-internal-ai-token}
-

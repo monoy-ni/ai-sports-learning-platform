@@ -4,12 +4,14 @@ import com.example.aisports.airecord.client.AiServiceClient;
 import com.example.aisports.airecord.dto.AiTaskResponse;
 import com.example.aisports.airecord.service.AiRecordService;
 import com.example.aisports.checkin.domain.CheckIn;
+import com.example.aisports.checkin.domain.CheckInReviewHistory;
 import com.example.aisports.checkin.domain.DataSource;
 import com.example.aisports.checkin.dto.CheckInRequest;
 import com.example.aisports.checkin.dto.CheckInResponse;
 import com.example.aisports.checkin.dto.CheckInListItem;
 import com.example.aisports.checkin.dto.CheckInReviewRequest;
 import com.example.aisports.checkin.repository.CheckInRepository;
+import com.example.aisports.checkin.repository.CheckInReviewHistoryRepository;
 import com.example.aisports.common.exception.BusinessException;
 import com.example.aisports.common.security.UserPrincipal;
 import org.springframework.stereotype.Service;
@@ -22,11 +24,16 @@ import java.util.List;
 @Service
 public class CheckInService {
     private final CheckInRepository repository;
+    private final CheckInReviewHistoryRepository historyRepository;
     private final AiServiceClient aiServiceClient;
     private final AiRecordService aiRecordService;
 
-    public CheckInService(CheckInRepository repository, AiServiceClient aiServiceClient, AiRecordService aiRecordService) {
+    public CheckInService(CheckInRepository repository,
+                          CheckInReviewHistoryRepository historyRepository,
+                          AiServiceClient aiServiceClient,
+                          AiRecordService aiRecordService) {
         this.repository = repository;
+        this.historyRepository = historyRepository;
         this.aiServiceClient = aiServiceClient;
         this.aiRecordService = aiRecordService;
     }
@@ -73,13 +80,37 @@ public class CheckInService {
     }
 
     @Transactional
-    public CheckInListItem review(Long checkInId, CheckInReviewRequest request) {
+    public CheckInListItem review(UserPrincipal principal, Long checkInId, CheckInReviewRequest request) {
         CheckIn checkIn = repository.findById(checkInId)
             .orElseThrow(() -> new BusinessException("CHECKIN_NOT_FOUND", "打卡记录不存在"));
+        // 保留修改痕迹: 先记录 old 值, 再更新
+        CheckInReviewHistory history = new CheckInReviewHistory();
+        history.setCheckInId(checkInId);
+        history.setReviewerId(principal.id());
+        history.setOldAbnormal(checkIn.getAbnormal());
+        history.setOldAbnormalReason(checkIn.getAbnormalReason());
+        history.setOldTeacherReviewNote(checkIn.getTeacherReviewNote());
+        history.setNewAbnormal(Boolean.TRUE.equals(request.abnormal()));
+        history.setNewAbnormalReason(request.abnormalReason());
+        history.setNewTeacherReviewNote(request.teacherReviewNote());
+        history.setEditReason(request.editReason());
+        historyRepository.save(history);
+        // 仅更新审核字段, 不动原始运动数据 (duration/distance/pace 等)
         checkIn.setAbnormal(Boolean.TRUE.equals(request.abnormal()));
         checkIn.setAbnormalReason(request.abnormalReason());
         checkIn.setTeacherReviewNote(request.teacherReviewNote());
         return CheckInListItem.from(repository.save(checkIn));
+    }
+
+    @Transactional(readOnly = true)
+    public List<CheckInReviewHistory> reviewHistory(Long checkInId) {
+        return historyRepository.findByCheckInIdOrderByCreatedAtDesc(checkInId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CheckIn> abnormalCheckIns(List<Long> studentIds) {
+        if (studentIds == null || studentIds.isEmpty()) return List.of();
+        return repository.findByStudentIdInAndAbnormalTrueOrderByCheckInDateDesc(studentIds);
     }
 
     private void markAbnormal(CheckIn checkIn) {
